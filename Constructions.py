@@ -86,14 +86,23 @@ class SectionsMenedger():
     def show(self): # Написать логику отображения секций
         pass 
 
-class Constructions(SectionsMenedger):
+class CaysingParametr(SectionsMenedger):
     def __init__(self):
         super().__init__()
         self._sections_name = "Casing"
+        self.cementic = True
 
 class HoleParametrs(SectionsMenedger):
     def __init__(self):
         super().__init__()
-        self._sections_name = "Hole_section"
+        self._sections_name = "Hole section"
 
+class CementBridge(SectionsMenedger):
+    def __init__(self):
+        super().__init__()
+        self._sections_name = "Cement bridge"
 
+class Perforations(SectionsMenedger):
+    def __init__(self):
+        super().__init__()
+        self._sections_name = "Perforation interval"
