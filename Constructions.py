@@ -73,14 +73,14 @@ class SectionsMenedger():
                 repit_name = self._test_name(name)
 
             self.sections[name] = section
-
+            self._count_sections += 1
 
         if section is not None:
             add(name, section)
         else:
             add(name, Section(start=start, stop = stop, diameter = diameter))
 
-        self._count_sections += 1
+
     
     
     def show(self): # Написать логику отображения секций
