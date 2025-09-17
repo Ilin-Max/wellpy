@@ -1,6 +1,6 @@
 import numpy as np
 from Traektory import Traektory
-from Constructions import Constructions, HoleParametrs
+from Constructions import Construction
 
 class Well():
     def __init__(self):
@@ -11,9 +11,7 @@ class Well():
         self.DensitySeeWather = 1.03
         self.Long = ""
         self.Land = ""
-        self.Constructions = Constructions()
-        self.HoleParametrs = HoleParametrs()
-        self.Perforations = ""
+        self.Constructions = Construction()
         self.Traektory = Traektory()
         self.Traektory.Z0 = self.KB
         self.DataSet = ""
