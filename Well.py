@@ -1,6 +1,6 @@
 import numpy as np
 from Traektory import Traektory
-from Constructions import Construction
+from Construction.Construction import Construction
 
 class Well():
     def __init__(self):

@@ -1,16 +1,12 @@
 from dataclasses import dataclass
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 @dataclass
 class Section():
     start: float
     stop: float
     diameter: float
-
-    def __str__(self):
-        return f"{self.start}-{self.stop} diameter = {self.diameter}"
-    
 
 class SectionsMenedger():
     def __init__(self, ):
@@ -91,65 +87,43 @@ class SectionsMenedger():
             add(name, section)
         else:
             add(name, Section(start=start, stop = stop, diameter = diameter))
+    
+    def _setings_show(self):
+        for sect in self.sections.values():
+            y_coord = [sect.start, sect.stop]
+            radius = sect.diameter/2
+            plt.plot([-radius, -radius], y_coord, color = "black")
+            plt.plot([radius, radius], y_coord, color = "black")
+
+
+       
+    def show(self):
+        plt.figure(figsize=(8, 10))
+        plt.title(self._name_set_sections)
+        
+        self._setings_show()
+        
+        ax = plt.gca()
+        ax.invert_yaxis()
+        ax.set_aspect(0.5)
+
+        plt.show()
+
 
     def to_df(self):
         name = []
         start = []
         stop = []
-        diametr = []
+        diameter = []
         for key, value in self.sections.items():
             name.append(key)
             start.append(value.start)
             stop.append(value.stop)
-            diametr.append(value.diameter)
+            diameter.append(value.diameter)
         data = {
                 "Name": name,
                 "Start": start,
                 "Stop": stop,
-                "diametr": diametr
+                "diameter": diameter
             }
         return pd.DataFrame(data)
-    
-    def show(self): # Написать логику отображения секций
-        pass 
-
-class CaysingParametr(SectionsMenedger):
-    def __init__(self):
-        super().__init__()
-        self._sections_name = "Casing"
-        self._name_set_sections = "CaysingParametr"
-        self.cementic = True
-
-class HoleParametrs(SectionsMenedger):
-    def __init__(self):
-        super().__init__()
-        self._sections_name = "Hole section"
-        self._name_set_sections = "HoleParametrs"
-
-class CementBridges(SectionsMenedger):
-    def __init__(self):
-        super().__init__()
-        self._sections_name = "Cement bridge"
-        self._name_set_sections = "CementBridges"
-
-class Perforations(SectionsMenedger):
-    def __init__(self):
-        super().__init__()
-        self._sections_name = "Perforation interval"
-        self._name_set_sections = "Perforations"
-
-class Construction():
-    def __init__(self):
-        self.HoleParametr = HoleParametrs()
-        self.CaysingParametr = CaysingParametr()
-        self.CementBridge = CementBridges()
-        self.Perforations = Perforations()
-    
-    def __str__(self):
-        Hole = str(self.HoleParametr)
-        Caysing = str(self.CaysingParametr)
-        Cement = str(self.CementBridge)
-        Perfor = str(self.Perforations)
-        return f"{str(Hole)}\n\n{str(Caysing)}\n\n{str(Cement)}\n\n{str(Perfor)}"
-    
-    
