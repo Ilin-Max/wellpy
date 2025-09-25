@@ -1,6 +1,6 @@
 import numpy as np
-from Traektory import Traektory
 from Construction.Construction import Construction
+from Traectory.Traectory import Traektory
 
 class Well():
     def __init__(self):
@@ -18,9 +18,7 @@ class Well():
         self.GIS = ""
         self.TimeLogs = ""
         self.Deaplogs = ""
-    
-
-    
+        
     @property
     def KB(self):
         return self.Traektory.Z0

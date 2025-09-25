@@ -1,5 +1,4 @@
-from .SectionsMenedger import SectionsMenedger
-from .PipesMenedger import PipesMenedger
+from DataclassMenedgers.SectionsMenedger import SectionsMenedger
 import matplotlib.pyplot as plt
 
 class CaysingParametr(SectionsMenedger):
@@ -21,6 +20,7 @@ class HoleParametrs(SectionsMenedger):
         super().__init__()
         self._sections_name = "Hole section"
         self._name_set_sections = "HoleParametrs"
+        self._finish_drill = True
 
 class CementBridges(SectionsMenedger):
     def __init__(self):
@@ -63,3 +63,4 @@ class Construction():
         ax.set_aspect(0.5)
 
         plt.show()
+
