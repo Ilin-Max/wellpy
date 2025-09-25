@@ -118,12 +118,4 @@ class Traektory():
     
 
 
-#md = np.arange(0, 1000, 10)
-#azim = np.ones_like(md)
-#inkl = np.ones_like(md) * 30
-#inkl_test = Inklinometria(MD_array=md, INKL_array=inkl, AZIM_array = azim)
-
-#inkl_test.show()
-
-
 

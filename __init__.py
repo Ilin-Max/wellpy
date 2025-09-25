@@ -1,3 +1,3 @@
-import Traektory
-import Well
-import Inklinometria
+from . import Traektory
+from . import Well
+from . import Inklinometria
