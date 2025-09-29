@@ -5,28 +5,28 @@ import pandas as pd
 class Inklinometria():
     def __init__(self, MD_array = None, INKL_array = None, AZIM_array = None):
         
-        self._MD = np.arange(0, 1000, 10) if MD_array is None else MD_array
-        self.__shape = len(self._MD)
+        self.MD = np.arange(0, 1000, 10) if MD_array is None else MD_array
+        self._shape = len(self.MD)
         
         if INKL_array is None:
-            self._INKL = np.zeros(self.__shape)
+            self.INKL = np.zeros(self._shape)
         else:
-            self._INKL  = INKL_array
+            self.INKL  = INKL_array
         
         if AZIM_array is None:
-            self._AZIM = np.zeros(self.__shape)
+            self.AZIM = np.zeros(self._shape)
         else:
-            self._AZIM  = AZIM_array    
+            self.AZIM  = AZIM_array    
 
-        self.dX = np.zeros(self.__shape)
-        self.dY = np.zeros(self.__shape)   
-        self.dZ = np.zeros(self.__shape)
-        self.X = np.zeros(self.__shape)
-        self.Y = np.zeros(self.__shape)
-        self.Z = np.zeros(self.__shape)
-        self.TVD = np.zeros(self.__shape)
+        self.dX = np.zeros(self._shape)
+        self.dY = np.zeros(self._shape)   
+        self.dZ = np.zeros(self._shape)
+        self.X = np.zeros(self._shape)
+        self.Y = np.zeros(self._shape)
+        self.Z = np.zeros(self._shape)
+        self.TVD = np.zeros(self._shape)
         
-        self.__update_inkl()
+        self._update_coord()
 
     def __repr__(self):
         return f"Inklinometria (MD_array = {str(self.MD)}, INKL_array = {str(self.INKL)}), AZIM_array = {str(self.AZIM)}"
@@ -47,7 +47,7 @@ class Inklinometria():
     def __ne__(self, other):
         return not self.__eq__(other)
     
-    def __update_inkl(self):
+    def _update_coord(self):
         delta_MD = np.diff(self.MD)
         middle_point_INKL = self.INKL[:-1] + np.diff(self.INKL)/2
         middle_point_AZIM = self.AZIM[:-1] + np.diff(self.AZIM)/2
@@ -57,35 +57,7 @@ class Inklinometria():
         self.X = np.cumsum(self.dX)
         self.Y = np.cumsum(self.dY)
         self.Z = np.cumsum(self.dZ)
-        self.TVD = self.Z
-
-    @property
-    def MD(self):
-        return self._MD
-    
-    @property
-    def INKL(self):
-        return self._INKL
-    
-    @property
-    def AZIM(self):
-        return self._AZIM
-    
-    @MD.setter
-    def MD(self, value):
-        self._MD = value
-        self.__update_inkl()
-    
-    @INKL.setter
-    def INKL(self, value):
-        self._INKL = value
-        self.__update_inkl()
-    
-    @AZIM.setter
-    def AZIM(self, value):
-        self._AZIM = value
-        self.__update_inkl()
-
+        self.TVD = np.copy(self.Z)
 
     def to_df(self):
         data = {

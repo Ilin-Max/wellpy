@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from DataClassMenedger import DataClassMenedger
+from . DataClassMenedger import DataClassMenedger
 import matplotlib.pyplot as plt
 
 @dataclass
@@ -14,7 +14,6 @@ class SectionsMenedger(DataClassMenedger):
         self._sections_name = "Section"
         self._name_set_sections = ""
         
-
     @property
     def sections(self):
         return self.objects 
