@@ -1,94 +1,64 @@
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
-from Inklinometria import Inklinometria
-    
-class Traektory():
-    def __init__(self):
-        self._step_of_depth = 0.1
 
-        self._inklinometria = Inklinometria()
-        self.X0 = 0
-        self.Y0 = 0
-        self.Z0 = 0
-
-        self.MD = np.arange(0, np.max(self._inklinometria.MD) + self.step_of_depth, self.step_of_depth)
-        self.AZIM = np.zeros_like(self.MD)
-        self.INKL = np.zeros_like(self.MD)
-        self.__mult_AZIM_INKL()
-
-    def __mult_AZIM_INKL(self):
-        for i in np.arange(len(self._inklinometria.MD) - 1):
-            mask = (self.MD >= self._inklinometria.MD[i]) & (self.MD <= self._inklinometria.MD[i + 1])
-            self.AZIM[mask] = self._inklinometria.AZIM[i]
-            self.INKL[mask] = self._inklinometria.INKL[i]
+class Inklinometria():
+    def __init__(self, MD_array = None, INKL_array = None, AZIM_array = None):
         
-        if len(self._inklinometria.MD) > 0:
-            last_mask = self.MD >= self._inklinometria.MD[-1]
-            self.AZIM[last_mask] = self._inklinometria.AZIM[-1]
-            self.INKL[last_mask] = self._inklinometria.INKL[-1]
-
-    def __Update_Traektory(self):
-        self.MD = np.arange(0, np.max(self._inklinometria.MD) + self.step_of_depth, self.step_of_depth)
-        self.__mult_AZIM_INKL()
-    
-
-    @property
-    def step_of_depth(self):
-        return self._step_of_depth
-    
-    @step_of_depth.setter
-    def step_of_depth(self, value):
-        self._step_of_depth = value
-        self.__Update_Traektory()
+        self.MD = np.arange(0, 1000, 10) if MD_array is None else MD_array
+        self._shape = len(self.MD)
         
-
-    @property
-    def delta_MD(self):
-        return np.diff(self.MD)
-    
-    @property
-    def middle_point_INKL(self):
-        return self.INKL[:-1] + np.diff(self.INKL)/2
-    
-    @property
-    def middle_point_AZIM(self):
-        return self.AZIM[:-1] + np.diff(self.AZIM)/2
-    
-    @property
-    def dX(self):
-        dx = np.zeros(len(self.MD))
-        dx[1:] = self.delta_MD * np.sin(np.radians(self.middle_point_INKL)) * np.sin(np.radians(self.middle_point_AZIM))
-        return dx
-
-    @property
-    def dY(self):
-        dy = np.zeros(len(self.MD))
-        dy[1:] = self.delta_MD * np.sin(np.radians(self.middle_point_INKL)) * np.cos(np.radians(self.middle_point_AZIM))
-        return dy
-
-    @property
-    def dZ(self):
-        dz = np.zeros(len(self.MD)) 
-        dz[1:] = self.delta_MD * np.cos(np.radians(self.middle_point_INKL))
-        return dz
-
-    @property
-    def X(self):
-         return self.X0 + np.cumsum(self.dX)
-
-    @property
-    def Y(self):
-        return self.Y0 + np.cumsum(self.dY)
-
-    @property
-    def Z(self):
-        return self.Z0 - np.cumsum(self.dZ)
-    
-    @property
-    def TVD(self):
-        return np.cumsum(self.dZ)
+        if INKL_array is None:
+            self.INKL = np.zeros(self._shape)
+        else:
+            self.INKL  = INKL_array
         
+        if AZIM_array is None:
+            self.AZIM = np.zeros(self._shape)
+        else:
+            self.AZIM  = AZIM_array    
+
+        self.dX = np.zeros(self._shape)
+        self.dY = np.zeros(self._shape)   
+        self.dZ = np.zeros(self._shape)
+        self.X = np.zeros(self._shape)
+        self.Y = np.zeros(self._shape)
+        self.Z = np.zeros(self._shape)
+        self.TVD = np.zeros(self._shape)
+        
+        self._update_coord()
+
+    def __repr__(self):
+        return f"Inklinometria (MD_array = {str(self.MD)}, INKL_array = {str(self.INKL)}), AZIM_array = {str(self.AZIM)}"
+    
+    def __str__(self):
+        return f"{self.to_df()}"
+    
+    def __eq__(self, other):
+        if not isinstance(other, Inklinometria):
+            return False
+        
+        return (
+            np.array_equal(self.MD, other.MD) and
+            np.array_equal(self.INKL, other.INKL) and
+            np.array_equal(self.AZIM, other.AZIM)
+        )
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    
+    def _update_coord(self):
+        delta_MD = np.diff(self.MD)
+        middle_point_INKL = self.INKL[:-1] + np.diff(self.INKL)/2
+        middle_point_AZIM = self.AZIM[:-1] + np.diff(self.AZIM)/2
+        self.dX[1:] = delta_MD * np.sin(np.radians(middle_point_INKL)) * np.sin(np.radians(middle_point_AZIM))
+        self.dY[1:] = delta_MD * np.sin(np.radians(middle_point_INKL)) * np.cos(np.radians(middle_point_AZIM))
+        self.dZ[1:] = -delta_MD * np.cos(np.radians(middle_point_INKL))
+        self.X = np.cumsum(self.dX)
+        self.Y = np.cumsum(self.dY)
+        self.Z = np.cumsum(self.dZ)
+        self.TVD = np.copy(self.Z)
+
     def to_df(self):
         data = {
             "MD": self.MD,
@@ -103,19 +73,76 @@ class Traektory():
             "Z": self.Z,
             }
         return pd.DataFrame(data)
-
-    def show(self, name = "Traektory"):
-        fig = plt.figure(figsize=(10, 7))
-        ax = fig.add_subplot(111, projection='3d')
+    
+    def _setings_show(self, ax,  name = "Traektory"):
         ax.plot(self.X, self.Y, self.Z, label=name, linewidth=2, color='blue')
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
         ax.set_title('Traektory')
-        ax.set_zlim([np.min(self.Z), self.Z0])
         ax.legend()
+
+    def show(self, name = "Traektory"):
+        fig = plt.figure(figsize=(10, 7))
+        ax = fig.add_subplot(111, projection='3d')
+        self._setings_show(ax, name = name)
         plt.show()
+
+class Traektory(Inklinometria):
+    def __init__(self, x0=0, y0=0, z0=0,
+                 inklinometria=None,
+                 MD_array=None, INKL_array=None,
+                 AZIM_array=None, step_of_depth=0.1):
+
+        self._step_of_depth = step_of_depth
+        self.X0 = x0
+        self.Y0 = y0
+        self.Z0 = z0
+        # create or use object Inklinometria
+        if inklinometria is None:
+            self.inklinometria = Inklinometria(MD_array=MD_array, INKL_array=INKL_array, AZIM_array=AZIM_array)
+        else:
+            self.inklinometria = inklinometria
+                     
+        # create array MD with select step
+        self.MD = np.arange(0, np.max(self.inklinometria.MD) + self._step_of_depth, self._step_of_depth)
+
+        # interpolation data
+        self.AZIM = np.zeros_like(self.MD)
+        self.INKL = np.zeros_like(self.MD)
+        self._mult_AZIM_INKL()
+        
+        # constructor class Inklinometria
+        super().__init__(MD_array=self.MD, INKL_array=self.INKL, AZIM_array=self.AZIM)
+
+    def _mult_AZIM_INKL(self):
+        # interpolation data
+        for i in range(len(self.inklinometria.MD) - 1):
+            mask = (self.MD >= self.inklinometria.MD[i]) & (self.MD < self.inklinometria.MD[i + 1])
+            self.AZIM[mask] = self.inklinometria.AZIM[i]
+            self.INKL[mask] = self.inklinometria.INKL[i]
+        
+        # last point
+        if len(self.inklinometria.MD) > 0:
+            last_mask = self.MD >= self.inklinometria.MD[-1]
+            self.AZIM[last_mask] = self.inklinometria.AZIM[-1]
     
+    def add_start_coord(self):
+        self.X += self.X0
+        self.Y += self.Y0
+        self.Z += self.Z0
+        self.TVD += self.Z0
+
+    def _update_coord(self):
+        super()._update_coord()
+        self.add_start_coord()
 
 
+    
+# df = pd.read_csv(r"C:\Users\User7\Desktop\pa-13.csv")
+# md = np.array(df["MD"])
+# inkl = np.array(df["INCL"])
+# azim = np.array(df["AZI"])
 
+# t = Traektory(MD_array=md, INKL_array=inkl, AZIM_array=azim)
+# t.show()
