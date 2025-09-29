@@ -17,9 +17,9 @@ class CurveStorage():
         self._object_name = "Curve"
         self._name_data_set = name_dataset
     
-    # def __str__(self):
-    #     df = self.to_df()
-    #     return str(df)
+    def __str__(self):
+        df = self.to_df()
+        return str(df)
    
     def __eq__(self, other):
         if not isinstance(other, type(self)):
