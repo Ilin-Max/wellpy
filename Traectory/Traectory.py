@@ -1,6 +1,93 @@
 import numpy as np
-from  Inklinometria import Inklinometria
+import matplotlib.pyplot as plt
+import pandas as pd
+
+class Inklinometria():
+    def __init__(self, MD_array = None, INKL_array = None, AZIM_array = None):
+        
+        self.MD = np.arange(0, 1000, 10) if MD_array is None else MD_array
+        self._shape = len(self.MD)
+        
+        if INKL_array is None:
+            self.INKL = np.zeros(self._shape)
+        else:
+            self.INKL  = INKL_array
+        
+        if AZIM_array is None:
+            self.AZIM = np.zeros(self._shape)
+        else:
+            self.AZIM  = AZIM_array    
+
+        self.dX = np.zeros(self._shape)
+        self.dY = np.zeros(self._shape)   
+        self.dZ = np.zeros(self._shape)
+        self.X = np.zeros(self._shape)
+        self.Y = np.zeros(self._shape)
+        self.Z = np.zeros(self._shape)
+        self.TVD = np.zeros(self._shape)
+        
+        self._update_coord()
+
+    def __repr__(self):
+        return f"Inklinometria (MD_array = {str(self.MD)}, INKL_array = {str(self.INKL)}), AZIM_array = {str(self.AZIM)}"
     
+    def __str__(self):
+        return f"{self.to_df()}"
+    
+    def __eq__(self, other):
+        if not isinstance(other, Inklinometria):
+            return False
+        
+        return (
+            np.array_equal(self.MD, other.MD) and
+            np.array_equal(self.INKL, other.INKL) and
+            np.array_equal(self.AZIM, other.AZIM)
+        )
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    
+    def _update_coord(self):
+        delta_MD = np.diff(self.MD)
+        middle_point_INKL = self.INKL[:-1] + np.diff(self.INKL)/2
+        middle_point_AZIM = self.AZIM[:-1] + np.diff(self.AZIM)/2
+        self.dX[1:] = delta_MD * np.sin(np.radians(middle_point_INKL)) * np.sin(np.radians(middle_point_AZIM))
+        self.dY[1:] = delta_MD * np.sin(np.radians(middle_point_INKL)) * np.cos(np.radians(middle_point_AZIM))
+        self.dZ[1:] = -delta_MD * np.cos(np.radians(middle_point_INKL))
+        self.X = np.cumsum(self.dX)
+        self.Y = np.cumsum(self.dY)
+        self.Z = np.cumsum(self.dZ)
+        self.TVD = np.copy(self.Z)
+
+    def to_df(self):
+        data = {
+            "MD": self.MD,
+            "AZIM": self.AZIM,
+            "INKL": self.INKL,
+            "TVD": self.TVD,
+            "dX": self.dX,
+            "dY": self.dY,
+            "dZ": self.dZ,
+            "X": self.X,
+            "Y": self.Y,
+            "Z": self.Z,
+            }
+        return pd.DataFrame(data)
+    
+    def _setings_show(self, ax,  name = "Traektory"):
+        ax.plot(self.X, self.Y, self.Z, label=name, linewidth=2, color='blue')
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        ax.set_title('Traektory')
+        ax.legend()
+
+    def show(self, name = "Traektory"):
+        fig = plt.figure(figsize=(10, 7))
+        ax = fig.add_subplot(111, projection='3d')
+        self._setings_show(ax, name = name)
+        plt.show()
+
 class Traektory(Inklinometria):
     def __init__(self, x0=0, y0=0, z0=0,
                  inklinometria=None,
@@ -39,19 +126,23 @@ class Traektory(Inklinometria):
         if len(self.inklinometria.MD) > 0:
             last_mask = self.MD >= self.inklinometria.MD[-1]
             self.AZIM[last_mask] = self.inklinometria.AZIM[-1]
-        
-    def _update_coord(self):
-        super()._update_coord()
-        # add starting coord
+    
+    def add_start_coord(self):
         self.X += self.X0
         self.Y += self.Y0
         self.Z += self.Z0
         self.TVD += self.Z0
 
-MD = np.array([0, 10 , 20 , 100])
-Az = np.array([10, 10 , 10 , 15])
-inkl = np.array([0, 20 , 30 , 50])
+    def _update_coord(self):
+        super()._update_coord()
+        self.add_start_coord()
 
-t = Traektory(x0 = 10, y0 = 10, z0 = 20, MD_array = MD, AZIM_array=Az, INKL_array=inkl)
-print(t)
-t.show()
+
+    
+# df = pd.read_csv(r"C:\Users\User7\Desktop\pa-13.csv")
+# md = np.array(df["MD"])
+# inkl = np.array(df["INCL"])
+# azim = np.array(df["AZI"])
+
+# t = Traektory(MD_array=md, INKL_array=inkl, AZIM_array=azim)
+# t.show()
