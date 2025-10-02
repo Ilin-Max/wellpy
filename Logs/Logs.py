@@ -89,15 +89,15 @@ class CurveItemStorage():
     def to_exel():
         pass
 
-las = lasio.read(r"C:\Users\User7\Desktop\pa-13_WBS.las")
-print(las.curves["CMW_MAX_TEN"])
-CMW_MAX_TEN = las.curves["CMW_MAX_TEN"]
+# las = lasio.read(r"C:\Users\User7\Desktop\pa-13_WBS.las")
+# print(las.curves["CMW_MAX_TEN"])
+# CMW_MAX_TEN = las.curves["CMW_MAX_TEN"]
  
-t = CurveItem("CMW_MAX_TEN", unit = CMW_MAX_TEN.unit, description = CMW_MAX_TEN.descr, data = CMW_MAX_TEN.data)
+# t = CurveItem("CMW_MAX_TEN", unit = CMW_MAX_TEN.unit, description = CMW_MAX_TEN.descr, data = CMW_MAX_TEN.data)
 
-data_set = CurveItemStorage()
-data_set.read_las(las)
+# data_set = CurveItemStorage()
+# data_set.read_las(las)
 
-print(data_set)
+# print(data_set)
 
 

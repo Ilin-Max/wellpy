@@ -58,7 +58,7 @@ class DataClassMenedger():
     def _test_name(self, name):
         return name in self.objects
 
-    def add_objects(self, *args, object = None,  name = ''):
+    def add_objects(self, object = None,  name = ''):
         if not name:
             name = self._object_name + "_" + str(self._count_object)
         

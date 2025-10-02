@@ -98,6 +98,7 @@ class Traektory(Inklinometria):
         self.X0 = x0
         self.Y0 = y0
         self.Z0 = z0
+        
         # create or use object Inklinometria
         if inklinometria is None:
             self.inklinometria = Inklinometria(MD_array=MD_array, INKL_array=INKL_array, AZIM_array=AZIM_array)
