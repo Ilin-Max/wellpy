@@ -1,7 +1,6 @@
 
-from dataclasses import dataclass, fields
+from dataclasses import fields
 import pandas as pd
-import matplotlib.pyplot as plt
 
 class DataClassMenedger():
     def __init__(self, class_for_work):
