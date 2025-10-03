@@ -16,7 +16,7 @@ class CurveItem():
     data: np.ndarray = field(default_factory=lambda: np.array([]))
 
 
-class LogsStorage():
+class LogsSet():
     def __init__(self, *args, name_dataset = "Curves"):
         self.name_data_set = name_dataset
         self._mnemonic_unilites_curve = "Data" 
@@ -68,7 +68,6 @@ class LogsStorage():
             except ValueError:
                 raise Exception(f"Dataset don't have curve '{index}'\n{str(self)}")
 
-            
     @property
     def index(self):
         try: 
@@ -97,7 +96,7 @@ class LogsStorage():
             else:
                 return(constant_step)
     
-    def read_las(self, las_file):
+    def read_las(self, las_file, name_logset = ""):
         def add_curves_from_lasioLASFile(self, las):
             for curve in las.curves:
                 mnemonic = curve.mnemonic
@@ -109,16 +108,27 @@ class LogsStorage():
                 curve = CurveItem(mnemonic, unit, value, description, original_mnemonic,data)
                 self._list_name_mnemonic.append(mnemonic)
                 self.curves.append(curve)
+                
         if type(las_file) == lasio.LASFile:
             add_curves_from_lasioLASFile(self, las_file)
+            if name_logset:
+                self.name_data_set = name_logset
+        
         else:
             try:
                 las = lasio.read(las_file)
                 add_curves_from_lasioLASFile(self, las)
+                if name_logset:
+                    self.name_data_set = name_logset
+                else:
+                    pass
             except Exception as e:
                 print(e)
     
-    def read_exel(self):
+    def read_exel(self, file_path):
+        pass
+    
+    def read_csv(self, file_path):
         pass
 
     def to_df():
@@ -129,19 +139,48 @@ class LogsStorage():
     
     def to_las():
         pass
+    
+    @staticmethod
+    def name_file:
+    
+class LogsMenedger:
+    def __init__(self, ):
+        self.datasets = []
+        self._name_datasets = []
+        self._count_dataset = 0
 
+    def add_set_logs(self, logs_set):
+        if type(logs_set) == LogsSet: 
+            self.datasets.append(logs_set)
+            self._name_datasets.append(logs_set.name_data_set)
+            self._count_dataset += 1
+        else:
+            raise Exception(f"try add object {type(logs_set)}, add only LogsSet object")
+    
+    def __str__(self):
+        return "\n".join(str(data) for data in self.datasets)
+
+    def add_from_las(self, las_file):
+        logs_set = LogsSet()
+        logs_set.read_las(las_file)
+        self.add_set_logs(logs_set)
+
+    def add_from_exel(self, file_path):
+        logs_set = LogsSet()
+        logs_set.read_exel(file_path)
+        self.add_set_logs(logs_set)
+    
+    def add_from_csv(self, file_path):
+        logs_set = LogsSet()
+        logs_set.read_csv(file_path)
+        self.add_set_logs(logs_set)
 
 las_path = r"C:\Users\User7\Desktop\pa-13_WBS.las"
 
-data_set = LogsStorage()
+data_set = LogsSet()
 data_set.read_las(r"C:\Users\User7\Desktop\pa-13_WBS.las")
 
+Data = LogsMenedger()
+Data.add_set_logs(data_set)
 
-curve = data_set['CMW_MAX_TEN'].data
-md = np.arange(0, 10000, 0.1)
-new_curve = linear_interpolation(md, data_set.index, curve)
-print(new_curve)
-
-plt.plot(curve, data_set.index)
-plt.plot(new_curve, md)
-plt.show()
+print(Data)

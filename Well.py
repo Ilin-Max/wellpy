@@ -1,7 +1,7 @@
 import numpy as np
 from Construction.Construction import Construction
 from Traectory.Traectory import Traektory
-from Logs.Logs import LogsStorage
+from Logs.Logs import LogsMenedger
 import matplotlib.pyplot as plt
 
 class Well():
@@ -16,9 +16,9 @@ class Well():
         self.Constructions = Construction()
         self.Traektory = Traektory()
         self.Traektory.Z0 = self.KB
-        self.DataSet = LogsStorage()
-        self.TimeLogs = LogsStorage()
-        self.Deaplogs = LogsStorage()
+        self.DataSet = LogsMenedger
+        # self.TimeLogs = LogsStorage()
+        # self.Deaplogs = LogsStorage()
 
     def new_Traectory(self, MD_array = None, INKL_array = None, AZIM_array = None):
         self.Traektory = Traektory(MD_array = MD_array, INKL_array = INKL_array, AZIM_array = AZIM_array, \
